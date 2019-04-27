@@ -9,7 +9,7 @@ var querry = args.slice(1);
 
 switch(cmd) {
     case `concert-this`:
-        concert_this(querry.join("%20"));
+        concert_this(querry.join(" "));
         break;
     case `spotify-this-song`:
         spotify_this(querry);
@@ -26,24 +26,18 @@ switch(cmd) {
 }
 
 function concert_this(artist) {
-    //get concert info about an artist
-    //display
-    // - Name of venue
-    // - Venue location
-    // - data of event
-    // Per bands in town API
-    // - Name of venue:
-    //    -- response.
+    console.log("Upcoming concert venue for "+artist)
+    artist = artist.split(" ").join("%20");
     var querryURL = "https://rest.bandsintown.com/artists/" + artist + "/events?app_id=codingbootcamp"
     axios.get(querryURL).then(function(response){
-        response.forEach(function(el,index) {
+        
+        response.data.forEach(function(el,index) {
             let venue = el.venue;
-            let date = new Date(el.datetime);
-            console.log(index,venue.name);
-            console.log("Location: ", venue.city +" ,"+venue.region+ " "+venue.country);
-            console.log("Date: ");
+            console.log(index+1,venue.name);
+            console.log("Location: ", venue.city +" "+venue.region+ ", "+venue.country);
+            console.log("Date: "+moment(el.datetime).format("MMMM Do, YYYY"));
         })
-    }).catch(errors) {
+    }).catch(function(errors) {
         console.log("Error at Bands In Town API request:" + errors);
-    }
+    })
 }
