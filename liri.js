@@ -16,7 +16,7 @@ switch(cmd) {
         spotify_this(querry);
         break;
     case `movie-this`:
-        movie_this(querry);
+        movie_this(querry.join(" "));
         break;
     case `do-what-it-says`:
         do_wis(querry);
@@ -65,5 +65,23 @@ function spotify_this(song) {
             console.log("Album: ",track.album.name);
             console.log(" ");
         })
+    })
+}
+
+function movie_this(title) {
+    console.log("Movie result for "+title)
+    console.log(" ")
+    title = title.split(" ").join("+");
+    var querryURL = "https://www.omdbapi.com/?apikey=trilogy&t="+title;
+    axios.get(querryURL).then(function(response){
+        console.log("Title: ", response.data.Title);
+        console.log("Year: ",response.data.Year);
+        console.log("IMBD Rating: ",response.data.Ratings[0].Value);
+        console.log("Rotten Tomatoes Rating: ",response.data.Ratings[1].Value);
+        console.log("Contry: ",response.data.Country);
+        console.log("Language :",response.data.Language);
+        console.log("Plot: ",response.data.Plot);
+        console.log("Actors: ",response.data.Actors);
+
     })
 }
