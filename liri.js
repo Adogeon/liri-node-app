@@ -7,24 +7,28 @@ var Spotify = require('node-spotify-api');
 
 var cmd = args[0]
 var querry = args.slice(1);
+processCMD(cmd,querry);
 
-switch(cmd) {
-    case `concert-this`:
-        concert_this(querry.join(" "));
-        break;
-    case `spotify-this-song`:
-        spotify_this(querry);
-        break;
-    case `movie-this`:
-        movie_this(querry.join(" "));
-        break;
-    case `do-what-it-says`:
-        do_wis(querry);
-        break;
-    default:
-        console.log("Wrong command");
-        break;
+function processCMD(command,querrySearch) {
+    switch(command) {
+        case `concert-this`:
+            concert_this(querrySearch.join(" "));
+            break;
+        case `spotify-this-song`:
+            spotify_this(querrySearch);
+            break;
+        case `movie-this`:
+            movie_this(querrySearch.join(" "));
+            break;
+        case `do-what-it-says`:
+            do_wis();
+            break;
+        default:
+            console.log("Wrong command");
+            break;
+    }
 }
+
 
 function concert_this(artist) {
     console.log("Upcoming concert venue for "+artist)
@@ -44,11 +48,10 @@ function concert_this(artist) {
 }
 
 function spotify_this(song) {
-    console.log(" ")
-    console.log("Here is the result for "+song);
     if (!song) {
         song = "The Sign"
     }
+    console.log("Here is the result for "+song);
     var spotify = new Spotify(keys.spotify);
     spotify.request('https://api.spotify.com/v1/search?q=\"'+song+'\"&type=track&market=US&limit=10').then(function(data){
         data.tracks.items.forEach(function(track,index) {
@@ -69,6 +72,9 @@ function spotify_this(song) {
 }
 
 function movie_this(title) {
+    if(!title) {
+        title = "Mr. Nobody"
+    }
     console.log("Movie result for "+title)
     console.log(" ")
     title = title.split(" ").join("+");
@@ -82,6 +88,17 @@ function movie_this(title) {
         console.log("Language :",response.data.Language);
         console.log("Plot: ",response.data.Plot);
         console.log("Actors: ",response.data.Actors);
+    })
+}
 
+function do_wis() {
+    const fs = require('fs');
+    fs.readFile('./random.txt',"utf8", (err, data)=> {
+        if(err)
+            console.log("Error readinf text:"+err);
+        let line = data.split(",");
+        let cmd = line[0];
+        let querry = line[1];
+        processCMD(cmd,querry);
     })
 }
