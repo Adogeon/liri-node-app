@@ -3,6 +3,7 @@ var keys = require("./keys.js");
 var axios = require("axios");
 var moment = require("moment");
 var args = process.argv.slice(2);
+var Spotify = require('node-spotify-api');
 
 var cmd = args[0]
 var querry = args.slice(1);
@@ -39,5 +40,30 @@ function concert_this(artist) {
         })
     }).catch(function(errors) {
         console.log("Error at Bands In Town API request:" + errors);
+    })
+}
+
+function spotify_this(song) {
+    console.log(" ")
+    console.log("Here is the result for "+song);
+    if (!song) {
+        song = "The Sign"
+    }
+    var spotify = new Spotify(keys.spotify);
+    spotify.request('https://api.spotify.com/v1/search?q=\"'+song+'\"&type=track&market=US&limit=10').then(function(data){
+        data.tracks.items.forEach(function(track,index) {
+            console.log(index+1,track.name)
+            if(track.artists.length === 1) {
+                console.log("Artist: "+track.artists[0].name);
+            } else {
+                console.log("Artists:")
+                track.artists.forEach(function(item) {
+                    console.log("- ",item.name);
+                })
+            }
+            console.log("Preview URL: "+track.external_urls.spotify);
+            console.log("Album: ",track.album.name);
+            console.log(" ");
+        })
     })
 }
