@@ -6,11 +6,14 @@ const Spotify = require('node-spotify-api');
 const fs = require('fs');
 
 function logThis(str) {
-    fs.appendFile("../log.txt",str,(err)=>{
+    const breakLine = "\n+++++++++++++++++++++++++++++++++\n";
+    fs.appendFile("../log.txt",str+breakLine,(err)=>{
         if(err);
             console.log(err);
+        console.log(str)
     })
 }
+
 
 var Grabber = function() {
     this.concert_this = function(artist) {
@@ -19,9 +22,12 @@ var Grabber = function() {
         axios.get(querryURL).then(function(response){
             response.data.forEach(function(el,index) {
                 let venue = el.venue;
-                console.log(index+1,venue.name);
-                console.log("Location: ", venue.city +" "+venue.region+ ", "+venue.country);
-                console.log("Date: "+moment(el.datetime).format("MMMM Do, YYYY"));
+                let dataStream = [
+                    `${index+1},${venue.name}`,
+                    `Location: ${venue.city} ${venue.region}, ${venue.country}`,
+                    `Date: ${moment(el.datetime).format("MMMM Do, YYYY")}`
+                ].join("\n");
+                logThis(dataStream);
             })
         }).catch(function(errors) {
             console.log("Error at Bands In Town API request:" + errors);
@@ -36,18 +42,21 @@ var Grabber = function() {
         var spotify = new Spotify(keys.spotify);
         spotify.request('https://api.spotify.com/v1/search?q=\"'+song+'\"&type=track&market=US&limit=10').then(function(data){
             data.tracks.items.forEach(function(track,index) {
-                console.log(index+1,track.name)
+                let dataStream = [`${index+1},${track.name}`]
                 if(track.artists.length === 1) {
-                    console.log("Artist: "+track.artists[0].name);
+                    dataStream.push(`Artist: ${track.artists[0].name}`);
                 } else {
-                    console.log("Artists:")
+                    let artistStr = "Artists:\n";
                     track.artists.forEach(function(item) {
-                        console.log("- ",item.name);
+                        artistStr = artistStr+`- ${item.name}\n`;
                     })
+                    dataStream.push(artistStr);
                 }
-                console.log("Preview URL: "+track.external_urls.spotify);
-                console.log("Album: ",track.album.name);
-                console.log(" ");
+                dataStream.concat([
+                    `Preview URL: ${track.external_urls.spotify}`,
+                    `Album: ${track.album.name}`
+                ]);
+                logThis(dataStream.join("\n"));
             })
         })
     }
@@ -60,14 +69,18 @@ var Grabber = function() {
         title = title.split(" ").join("+");
         var querryURL = "https://www.omdbapi.com/?apikey=trilogy&t="+title;
         axios.get(querryURL).then(function(response){
-            console.log("Title: ", response.data.Title);
-            console.log("Year: ",response.data.Year);
-            console.log("IMBD Rating: ",response.data.Ratings[0].Value);
-            console.log("Rotten Tomatoes Rating: ",response.data.Ratings[1].Value);
-            console.log("Contry: ",response.data.Country);
-            console.log("Language :",response.data.Language);
-            console.log("Plot: ",response.data.Plot);
-            console.log("Actors: ",response.data.Actors);
+            let data = response.data;
+            let dataStream = [
+                `Title: ${data.Title}`,
+                `Year: ${data.Year}`,
+                `IMBD Rating: ${data.Ratings[0].Value}`,
+                `Rotten Tomatoes Rating: ${data.Ratings[1].Value}`,
+                `Contry: ${data.Country}`,
+                `Language :" ${data.Language}`,
+                `Plot: ${data.Plot}`,
+                `Actors: ${data.Actors}`,
+            ].join("\n");
+            logThis(dataStream);
         })
     }
 }
