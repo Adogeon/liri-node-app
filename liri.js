@@ -1,9 +1,11 @@
-const grabber = require("./support/grabber.js")
+const Grabber = require("./support/grabber.js")
 var cmd = process.argv[2]
 var querry = process.argv.slice(3).join(" ");
+
 processCMD(cmd,querry);
 
 function processCMD(command,querrySearch) {
+    let grabber = new Grabber();
     switch(command) {
         case `concert-this`:
             grabber.concert_this(querrySearch);
@@ -28,9 +30,11 @@ function do_wis() {
     fs.readFile('./random.txt',"utf8", (err, data)=> {
         if(err)
             console.log("Error readinf text:"+err);
-        let line = data.split(",");
-        let cmd = line[0];
-        let querry = line[1];
-        processCMD(cmd,querry);
+        let lines = data.split("\n");
+        lines.forEach(function(line) {
+            let cmd = line.split(",")[0];
+            let querry = line.split(",")[1];
+            processCMD(cmd,querry);
+        })
     })
 }
