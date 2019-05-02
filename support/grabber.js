@@ -9,7 +9,7 @@ function logThis(str) {
     fs.appendFile("../log.txt",str,(err)=>{
         if(err);
             console.log(err);
-    }
+    })
 }
 
 var Grabber = function() {
